@@ -199,6 +199,18 @@ var App;
         }
         loadRecursive(toLoad);
     }
+    function allReposSelected() {
+        return getSelectedRepos().length === appState.metadata.Repositories.length;
+    }
+    function updateCheckallButton(unselect) {
+        let $selectAll = document.getElementById('selectall-button');
+        if (unselect) {
+            $selectAll.innerText = 'Unselect all';
+        }
+        else {
+            $selectAll.innerText = 'Select all';
+        }
+    }
     function setupUI() {
         var $corpusSelection = document.getElementById('corpus-selection');
         var selectionHTML = '';
@@ -224,6 +236,22 @@ var App;
         $loadRepos.onclick = function () {
             loadRepositories();
         };
+        let $selectAll = document.getElementById('selectall-button');
+        $selectAll.onclick = function () {
+            let allSelected = allReposSelected();
+            let value = !allSelected;
+            for (let repo of appState.metadata.Repositories) {
+                let $checkbox = (document.getElementById(`repository-${repo.Name}`));
+                $checkbox.checked = value;
+            }
+            updateCheckallButton(value);
+        };
+        for (let repo of appState.metadata.Repositories) {
+            let $checkbox = (document.getElementById(`repository-${repo.Name}`));
+            $checkbox.onchange = function () {
+                updateCheckallButton(allReposSelected());
+            };
+        }
         var $run = document.getElementById('run-button');
         var $results = document.getElementById('search-results');
         $results.innerHTML = '';
