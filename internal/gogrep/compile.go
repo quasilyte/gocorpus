@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-
-	"github.com/quasilyte/gocorpus/internal/stdinfo"
 )
 
 type compileError string
@@ -495,19 +493,19 @@ func (c *compiler) compileCallExpr(n *ast.CallExpr) {
 // selector expression that requires `fmt` to be a package as opposed
 // to only check that it's an identifier with "fmt" value.
 func (c *compiler) compileSymbol(fn ast.Expr) {
-	if e, ok := fn.(*ast.SelectorExpr); ok {
-		if ident, ok := e.X.(*ast.Ident); ok && stdinfo.Packages[ident.Name] != "" {
-			c.emitInst(instruction{
-				op:         opSimpleSelectorExpr,
-				valueIndex: c.internString(e.Sel, e.Sel.String()),
-			})
-			c.emitInst(instruction{
-				op:         opStdlibPkg,
-				valueIndex: c.internString(ident, ident.Name),
-			})
-			return
-		}
-	}
+	// if e, ok := fn.(*ast.SelectorExpr); ok {
+	// 	if ident, ok := e.X.(*ast.Ident); ok && stdinfo.Packages[ident.Name] != "" {
+	// 		c.emitInst(instruction{
+	// 			op:         opSimpleSelectorExpr,
+	// 			valueIndex: c.internString(e.Sel, e.Sel.String()),
+	// 		})
+	// 		c.emitInst(instruction{
+	// 			op:         opStdlibPkg,
+	// 			valueIndex: c.internString(ident, ident.Name),
+	// 		})
+	// 		return
+	// 	}
+	// }
 
 	c.compileExpr(fn)
 }
