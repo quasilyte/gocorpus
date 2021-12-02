@@ -1,4 +1,7 @@
-.PHONY: all wasm ts
+.PHONY: all wasm ts run-server
+
+run-server:
+	go run _script/server.go
 
 ts:
 	tsc --target es6 app.ts
