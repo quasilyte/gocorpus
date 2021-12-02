@@ -25,6 +25,7 @@ var App;
         go: null,
         wasm: null,
         busy: false,
+        running: false,
         // Current query state.
         searchResults: new Map(),
         filesTotal: 0,
@@ -60,37 +61,49 @@ var App;
     function doChunks(count, f, finished) {
         var i = 0;
         (function step() {
-            f(i);
+            if (!f(i)) {
+                finished(true);
+                return;
+            }
             i++;
             if (i < count) {
                 setTimeout(step, 0);
             }
             else {
-                finished();
+                finished(false);
             }
         })();
     }
+    function searchDone() {
+        appState.busy = false;
+        updateStatus('ready');
+        var $run = document.getElementById('run-button');
+        $run.innerText = 'Run';
+        appState.running = false;
+        let $progress = document.getElementById('search-progress');
+        $progress.innerHTML = `Progress: 100% (hits: ${appState.hits})`;
+        var $results = document.getElementById('search-results');
+        var parts = [];
+        var sortedMatches = [...appState.searchResults.entries()].sort((a, b) => b[1] - a[1]);
+        for (let e of sortedMatches) {
+            let [m, num] = e;
+            let numStr = num == 1 ? '' : ` (${num} matches)`;
+            parts.push(`<li><span class="result">${m}${numStr}</span></li>`);
+        }
+        $results.innerHTML += '<ol>' + parts.join('') + '</ol>';
+    }
     function runQueryRecursive(pattern, toScan) {
         if (toScan.length == 0) {
-            appState.busy = false;
-            updateStatus('ready');
-            let $progress = document.getElementById('search-progress');
-            $progress.innerHTML = `Progress: 100% (hits: ${appState.hits})`;
-            var $results = document.getElementById('search-results');
-            var parts = [];
-            var sortedMatches = [...appState.searchResults.entries()].sort((a, b) => b[1] - a[1]);
-            for (let e of sortedMatches) {
-                let [m, num] = e;
-                let numStr = num == 1 ? '' : ` (${num} matches)`;
-                parts.push(`<li><span class="result">${m}${numStr}</span></li>`);
-            }
-            $results.innerHTML += '<ol>' + parts.join('') + '</ol>';
+            searchDone();
             return;
         }
         let repo = toScan.pop();
         let repoData = appState.corpus.get(repo.Name);
         let files = repoData.files;
         doChunks(files.length, i => {
+            if (!appState.running) {
+                return false;
+            }
             let f = files[i];
             updateStatus(`processing ${f.name}`);
             let $progress = document.getElementById('search-progress');
@@ -99,11 +112,11 @@ var App;
             let result = gogrep(pattern, f.name, f.contents);
             if (result.error) {
                 console.error(`grepping ${f.name}: ${result.error}`);
-                return;
+                return true;
             }
             appState.filesScanned++;
             if (!result.matches) {
-                return;
+                return true;
             }
             appState.hits += result.matches.length;
             for (let m of result.matches) {
@@ -117,8 +130,14 @@ var App;
                     appState.searchResults.set(m, 1);
                 }
             }
-        }, () => {
-            runQueryRecursive(pattern, toScan);
+            return true;
+        }, (stopped) => {
+            if (stopped) {
+                searchDone();
+            }
+            else {
+                runQueryRecursive(pattern, toScan);
+            }
         });
     }
     function loadRepo(repo) {
@@ -209,6 +228,10 @@ var App;
         var $results = document.getElementById('search-results');
         $results.innerHTML = '';
         $run.onclick = function () {
+            if (appState.running) {
+                appState.running = false;
+                return;
+            }
             if (appState.busy) {
                 return;
             }
@@ -225,6 +248,8 @@ var App;
             }
             let $progress = document.getElementById('search-progress');
             $progress.innerHTML = '';
+            $run.innerText = 'Stop';
+            appState.running = true;
             runQueryRecursive(pattern, repos);
         };
     }
