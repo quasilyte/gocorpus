@@ -190,10 +190,13 @@ namespace App {
             }));
     }
 
-    function loadRecursive(toLoad: repositoryInfo[]) {
+    function loadRecursive(toLoad: repositoryInfo[], onFinish) {
         if (toLoad.length == 0) {
             appState.busy = false;
             updateStatus('ready');
+            if (onFinish) {
+                onFinish();
+            }
             return;
         }
         let repo = toLoad.pop();
@@ -216,7 +219,7 @@ namespace App {
                 let $checkbox = <HTMLInputElement>(document.getElementById(`repository-${repo.Name}`));
                 $checkbox.parentElement.classList.add('blue-text');
 
-                loadRecursive(toLoad);
+                loadRecursive(toLoad, onFinish);
             });
     }
 
@@ -232,11 +235,7 @@ namespace App {
         return selected;
     }
 
-    function loadRepositories() {
-        if (appState.busy) {
-            return;
-        }
-
+    function forcedLoadRepositories(onFinish = function() {}) {
         appState.busy = true;
         let toLoad: repositoryInfo[] = [];
         for (let repo of getSelectedRepos()) {
@@ -244,7 +243,14 @@ namespace App {
                 toLoad.push(repo);
             }
         }
-        loadRecursive(toLoad);
+        loadRecursive(toLoad, onFinish);
+    }
+
+    function loadRepositories() {
+        if (appState.busy) {
+            return;
+        }
+        forcedLoadRepositories();
     }
 
     function allReposSelected() {
@@ -327,11 +333,13 @@ namespace App {
             for (let repo of repos) {
                 appState.filesTotal += repo.Files.length;
             }
-            let $progress = document.getElementById('search-progress');
-            $progress.innerHTML = '';
-            $run.innerText = 'Stop';
-            appState.running = true;
-            runQueryRecursive(pattern, repos);
+            forcedLoadRepositories(() => {
+                let $progress = document.getElementById('search-progress');
+                $progress.innerHTML = '';
+                $run.innerText = 'Stop';
+                appState.running = true;
+                runQueryRecursive(pattern, repos);
+            });
         };
     }
 
