@@ -1,0 +1,60 @@
+<html>
+    <head>
+      <meta charset="utf-8"/>
+      <script src="wasm_exec.js"></script>
+      <script src="pako.min.js"></script>
+      <script src="untar.min.js"></script>
+      <script src="app.js"></script>
+      <link rel="stylesheet" type="text/css" href="theme.css"/>
+      <link rel="stylesheet" type="text/css" href="style.css"/>
+    </head>
+
+    <body><div class="container-lg px-0 my-5 markdown-body">
+      <table style="table-layout: auto; width: 1280px">
+        <tr>
+          <td style="width: 800px">
+            Search over a Go corpus
+            
+          </td>
+          <td style="width: 360px">
+            <button id="run-button"">Run</button>
+            <button id="share-button" style="margin-left: 16px;">Share</button>
+            <button id="help-button" style="margin-left: 16px;">Help</button>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            Search pattern
+            <div class="code-block">
+              <textarea id="search-pattern" class="editor code block" data-gramm="false" spellcheck="false"></textarea>
+            </div>
+          </td>
+      </tr>
+      <tr>
+        <td>
+          Status: <span id="status">undefined [Object object] and Where to Find Them</span>
+        </td>
+        <td>
+          <span id="search-progress"></span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          Repositories
+          <button id="load-button" style="margin-left: 16px;">Load</button>
+          <br>
+          <br>
+          <div id="corpus-selection"></div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          Query results
+          <hr>
+          <span id="search-results"></span>
+        </td>
+      </tr>
+      </table>
+    </div></body>
+</html>
+
