@@ -146,7 +146,14 @@ namespace App {
                     return false;
                 }
                 let f = files[i];
-                updateStatus(`processing ${f.name}`);
+                let filename = f.name;
+                if (filename.length > 58) {
+                    let nameParts = filename.split('/');
+                    let baseName = nameParts[nameParts.length-1];
+                    let prefixLen = baseName.length >= 28 ? 32 : 48;
+                    filename = filename.substr(0, prefixLen) + '{...}/' + baseName;
+                }
+                updateStatus(`processing ${filename}`);
                 let $progress = document.getElementById('search-progress');
                 let progressValue = Math.round((appState.filesScanned / appState.filesTotal) * 100);
                 $progress.innerHTML = `Progress: ${progressValue}% (hits: ${appState.hits})`;
