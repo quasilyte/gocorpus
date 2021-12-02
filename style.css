@@ -46,3 +46,7 @@ button {
     padding: 0;
     white-space: pre;
 }
+#search-results {
+    width: 1024px;
+    display: inline-block;
+}
