@@ -135,10 +135,12 @@ namespace App {
         })();
     }
 
-    function calculateFrequencyScore(): number {
+    function getFrequencyStats(): number[] {
+        // append($_, $_) => 24.1662
         const baselineFrequency = 70.0; // `err != nil` score
         const resultFrequency = appState.slocProcessed / appState.hits;
-        return 100.0 * (baselineFrequency / resultFrequency);
+        const relativeRate = 100.0 * (baselineFrequency / resultFrequency);
+        return [relativeRate, Math.round(resultFrequency)];
     }
 
     function searchDone() {
@@ -155,8 +157,12 @@ namespace App {
         var $results = document.getElementById('search-results');
         var parts = [];
         var sortedMatches = [...appState.searchResults.entries()].sort((a, b) => b[1] - a[1]);
-        let freqScore = calculateFrequencyScore();
-        parts.push(`<p><i>Frequency score: ${freqScore.toFixed(4)}</i></p>`);
+        if (appState.hits !== 0) {
+            let [freqScore, freqPerSLOC] = getFrequencyStats();
+            parts.push(`<p><i>Frequency score: ${freqScore.toFixed(4)} (1 match per ~${freqPerSLOC.toLocaleString()} SLOC)</i></p>`);
+        } else {
+            parts.push(`<p><i>Frequency score: 0</i></p>`);
+        }
         parts.push(`<p><i>Time elapsed: ${elapsedSeconds.toFixed(2)} sec</i></p>`);
         for (let e of sortedMatches) {
             let [m, num] = e;
