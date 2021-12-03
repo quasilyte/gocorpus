@@ -301,6 +301,17 @@ namespace App {
                         }
                         console.error(`${repo.Name}: missing files`, missingFiles);
                     }
+                } else {
+                    // Files count is correct. Check the order.
+                    for (let i in repoData.files) {
+                        let f1 = repoData.files[i];
+                        let name = f1.name.slice(repo.Name.length + 1);
+                        let f2 = repo.Files[i];
+                        if (name !== f2.Name) {
+                            console.error(`${repo.Name}: files[${i}] name mismatch: ${name} vs ${f2.Name}`);
+                            break;
+                        }
+                    }
                 }
                 console.log(`loaded ${repo.Name} repo`);
                 appState.corpus.set(repo.Name, repoData);
