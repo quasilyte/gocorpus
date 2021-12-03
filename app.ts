@@ -317,7 +317,7 @@ namespace App {
                     }
                     var repo = appState.metadata.Repositories[index];
                     let sizeMB = (repo.MinifiedSize * 0.000001).toFixed(1);
-                    let hint = `Tags: [${repo.Tags}], Size: ${sizeMB} MB, Files: ${repo.Files.length}, SLOC: ${repo.SLOC}`;
+                    let hint = `Tags: [${repo.Tags}], Size: ${sizeMB} MB, Files: ${repo.Files.length}, SLOC: ${repo.SLOC.toLocaleString()}`;
                     selectionHTML += `<td><label title="${hint}"><input id="repository-${repo.Name}" type="checkbox"> ${repo.Name}</label></td>`;
                 }
                 selectionHTML += '</tr>';
