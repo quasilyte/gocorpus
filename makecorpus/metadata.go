@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
+
+	"github.com/quasilyte/gocorpus/internal/filebits"
 )
 
 type CorpusMeta struct {
@@ -73,34 +75,25 @@ func (m *FileMeta) WriteJSON(w io.Writer, indent int) {
 	fmt.Fprintf(w, `%s{"Name": %q, "Flags": %d}`, tabs[indent], m.Name, m.Flags)
 }
 
-const (
-	filebitIsTest = 1 << iota
-	filebitIsAutogen
-	filebitIsMain
-	filebitImportsC
-	filebitImportsUnsafe
-	filebitImportsReflect
-)
-
 func newFileMeta(info *repositoryFileInfo) FileMeta {
 	var m FileMeta
 	if info.isTest {
-		m.Flags |= filebitIsTest
+		m.Flags |= filebits.IsTest
 	}
 	if info.isAutogen {
-		m.Flags |= filebitIsAutogen
+		m.Flags |= filebits.IsAutogen
 	}
 	if info.isMain {
-		m.Flags |= filebitIsMain
+		m.Flags |= filebits.IsMain
 	}
 	if info.importsC {
-		m.Flags |= filebitImportsC
+		m.Flags |= filebits.ImportsC
 	}
 	if info.importsUnsafe {
-		m.Flags |= filebitImportsUnsafe
+		m.Flags |= filebits.ImportsUnsafe
 	}
 	if info.importsReflect {
-		m.Flags |= filebitImportsReflect
+		m.Flags |= filebits.ImportsReflect
 	}
 	return m
 }

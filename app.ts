@@ -14,7 +14,7 @@ namespace App {
     }
 
     interface gogrepResult {
-        error?: string;
+        err?: string;
         matches?: string[];
     }
 
@@ -47,7 +47,15 @@ namespace App {
         contents: string;
     }
 
-    declare function gogrep(pattern: string, filename: string, src: string): gogrepResult;
+    interface gogrepArgs {
+        pattern: string;
+        filter: string;
+        fileFlags: number;
+        targetName: string;
+        targetSrc: string;
+    }
+
+    declare function gogrep(args: gogrepArgs): gogrepResult;
 
     const appState = {
         metadata: <corpusInfo>(null),
@@ -60,6 +68,7 @@ namespace App {
         running: false,
 
         // Current query state.
+        runError: '',
         searchResults: new Map<string, number>(),
         filesTotal: 0,
         filesScanned: 0,
@@ -68,6 +77,15 @@ namespace App {
 
     function updateStatus(status: string) {
         document.getElementById('status').innerText = status;
+    }
+
+    function ready() {
+        if (appState.runError === '') {
+            updateStatus('ready');
+        } else {
+            updateStatus('ERROR ' + appState.runError);
+        }
+        appState.runError = '';
     }
 
     function loadMetadata() {
@@ -114,7 +132,7 @@ namespace App {
 
     function searchDone() {
         appState.busy = false;
-        updateStatus('ready');
+        ready();
         var $run = document.getElementById('run-button');
         $run.innerText = 'Run';
         appState.running = false;
@@ -131,7 +149,7 @@ namespace App {
         $results.innerHTML += '<ol>' + parts.join('') + '</ol>';
     }
 
-    function runQueryRecursive(pattern: string, toScan: repositoryInfo[]) {
+    function runQueryRecursive(pattern: string, filter: string, toScan: repositoryInfo[]) {
         if (toScan.length == 0) {
             searchDone();
             return;
@@ -157,10 +175,19 @@ namespace App {
                 let $progress = document.getElementById('search-progress');
                 let progressValue = Math.round((appState.filesScanned / appState.filesTotal) * 100);
                 $progress.innerHTML = `Progress: ${progressValue}% (hits: ${appState.hits})`;
-                let result = gogrep(pattern, f.name, f.contents);
-                if (result.error) {
-                    console.error(`grepping ${f.name}: ${result.error}`);
-                    return true;
+
+                let result = gogrep({
+                    pattern: pattern,
+                    filter: filter,
+                    fileFlags: repo.Files[i].Flags,
+                    targetName: f.name,
+                    targetSrc: f.contents,
+                });
+                if (result.err) {
+                    console.error(`grepping ${f.name}: ${result.err}`);
+                    appState.runError = result.err;
+                    appState.running = false;
+                    return false;
                 }
                 appState.filesScanned++;
                 if (!result.matches) {
@@ -183,7 +210,7 @@ namespace App {
                 if (stopped) {
                     searchDone();
                 } else {
-                    runQueryRecursive(pattern, toScan);
+                    runQueryRecursive(pattern, filter, toScan);
                 }
             });
     }
@@ -200,7 +227,7 @@ namespace App {
     function loadRecursive(toLoad: repositoryInfo[], onFinish) {
         if (toLoad.length == 0) {
             appState.busy = false;
-            updateStatus('ready');
+            ready();
             if (onFinish) {
                 onFinish();
             }
@@ -331,6 +358,7 @@ namespace App {
             }
             appState.busy = true;
             let pattern = (<HTMLTextAreaElement>document.getElementById('search-pattern')).value;
+            let filter = (<HTMLTextAreaElement>document.getElementById('results-filter')).value;
             $results.innerHTML = '';
             appState.searchResults.clear();
             appState.filesScanned = 0;
@@ -345,13 +373,13 @@ namespace App {
                 $progress.innerHTML = '';
                 $run.innerText = 'Stop';
                 appState.running = true;
-                runQueryRecursive(pattern, repos);
+                runQueryRecursive(pattern, filter, repos);
             });
         };
     }
 
     function runApp(wasm) {
-        updateStatus('ready');
+        ready();
         console.log("runApp()");
         appState.wasm = wasm;
         appState.go.run(wasm);
