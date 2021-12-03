@@ -43,6 +43,9 @@ const (
 	// OpAnd = $Args[0] && $Args[1]
 	OpAnd
 
+	// OpOr = $Args[0] || $Args[1]
+	OpOr
+
 	// OpVarIsConst = vars[$Str].IsConst()
 	OpVarIsConst
 

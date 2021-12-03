@@ -53,6 +53,16 @@ func TestCompile(t *testing.T) {
 			input: `$x.IsPure()`,
 			expr:  `(VarIsPure "x")`,
 		},
+		{
+			input: `$x.IsPure() || $y.IsPure()`,
+			expr:  `(Or (VarIsPure "x") (VarIsPure "y"))`,
+		},
+
+		{
+			input: `!file.IsAutogen() && (!$x.IsPure() || !$y.IsPure())`,
+			expr:  `(Or (Not (VarIsPure "x")) (Not (VarIsPure "y")))`,
+			info:  `AutogenFileCond=false`,
+		},
 
 		{
 			input: `(file.IsAutogen()) && !file.IsTest()`,

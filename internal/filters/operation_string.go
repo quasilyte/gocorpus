@@ -12,13 +12,14 @@ func _() {
 	_ = x[OpNop-1]
 	_ = x[OpNot-2]
 	_ = x[OpAnd-3]
-	_ = x[OpVarIsConst-4]
-	_ = x[OpVarIsPure-5]
+	_ = x[OpOr-4]
+	_ = x[OpVarIsConst-5]
+	_ = x[OpVarIsPure-6]
 }
 
-const _Operation_name = "InvalidNopNotAndVarIsConstVarIsPure"
+const _Operation_name = "InvalidNopNotAndOrVarIsConstVarIsPure"
 
-var _Operation_index = [...]uint8{0, 7, 10, 13, 16, 26, 35}
+var _Operation_index = [...]uint8{0, 7, 10, 13, 16, 18, 28, 37}
 
 func (i Operation) String() string {
 	if i < 0 || i >= Operation(len(_Operation_index)-1) {

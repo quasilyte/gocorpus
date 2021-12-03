@@ -103,6 +103,9 @@ func applyFilter(f *filters.Expr, n ast.Node, m gogrep.MatchData) bool {
 	case filters.OpAnd:
 		return applyFilter(f.Args[0], n, m) && applyFilter(f.Args[1], n, m)
 
+	case filters.OpOr:
+		return applyFilter(f.Args[0], n, m) || applyFilter(f.Args[1], n, m)
+
 	case filters.OpVarIsConst:
 		v, ok := m.CapturedByName(f.Str)
 		if !ok {

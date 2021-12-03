@@ -165,6 +165,20 @@ func (cl *compiler) compileUnaryExpr(root *ast.UnaryExpr) (*Expr, error) {
 
 func (cl *compiler) compileBinaryExpr(root *ast.BinaryExpr) (*Expr, error) {
 	switch root.Op {
+	case token.LOR:
+		isTopLevel := cl.isTopLevel
+		cl.isTopLevel = false
+		lhs, err := cl.CompileExpr(root.X)
+		if err != nil {
+			return nil, err
+		}
+		rhs, err := cl.CompileExpr(root.Y)
+		if err != nil {
+			return nil, err
+		}
+		cl.isTopLevel = isTopLevel
+		return &Expr{Op: OpOr, Args: []*Expr{lhs, rhs}}, nil
+
 	case token.LAND:
 		lhs, err := cl.CompileExpr(root.X)
 		if err != nil {
