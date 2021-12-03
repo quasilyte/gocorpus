@@ -185,7 +185,7 @@ namespace App {
                 if (filename.length > 58) {
                     let nameParts = filename.split('/');
                     let baseName = nameParts[nameParts.length-1];
-                    let prefixLen = baseName.length >= 28 ? 32 : 48;
+                    let prefixLen = baseName.length >= 24 ? 28 : 42;
                     filename = filename.substr(0, prefixLen) + '{...}/' + baseName;
                 }
                 updateStatus(`processing ${filename}`);
@@ -271,6 +271,36 @@ namespace App {
                     f.name = rawFile.name;
                     f.contents = dec.decode(rawFile.buffer);
                     repoData.files.push(f);
+                }
+                if (repoData.files.length != repo.Files.length) {
+                    console.error(`${repo.Name}: unpacked files count mismatch: have ${repoData.files.length}, want ${repo.Files.length}`);
+                    if (repoData.files.length > repo.Files.length) {
+                        let wantFiles = {};
+                        for (let f of repo.Files) {
+                            wantFiles[f.Name] = true;
+                        }
+                        let unexpectedFiles = [];
+                        for (let f of repoData.files) {
+                            let name = f.name.slice(repo.Name.length + 1);
+                            if (!(name in wantFiles)) {
+                                unexpectedFiles.push(name);
+                            }
+                        }
+                        console.error(`${repo.Name}: unexpected files`, unexpectedFiles);
+                    } else {
+                        let haveFiles = {};
+                        for (let f of repoData.files) {
+                            let name = f.name.slice(repo.Name.length + 1);
+                            haveFiles[name] = true;
+                        }
+                        let missingFiles = [];
+                        for (let f of repo.Files) {
+                            if (!(f.Name in haveFiles)) {
+                                missingFiles.push(f.Name);
+                            }
+                        }
+                        console.error(`${repo.Name}: missing files`, missingFiles);
+                    }
                 }
                 console.log(`loaded ${repo.Name} repo`);
                 appState.corpus.set(repo.Name, repoData);
