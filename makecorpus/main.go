@@ -14,7 +14,9 @@ func main() {
 
 	ctx := &context{
 		tmpDir: os.TempDir(),
-		meta:   &CorpusMeta{},
+		meta: &CorpusMeta{
+			Version: corpusVersion,
+		},
 	}
 
 	flag.BoolVar(&ctx.verbose, "v", false, "whether to print debug output")

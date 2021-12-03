@@ -75,7 +75,8 @@ func collectFiles(ctx *context) *RepositoryMeta {
 			if err != nil {
 				return err
 			}
-			meta.SLOC += fset.Position(f.End()).Line
+			sloc := fset.Position(f.End()).Line
+			meta.SLOC += sloc
 			minifiedSrc := minifyGo(fset, f)
 
 			relPath := strings.TrimPrefix(path, absSrcRoot)
@@ -84,6 +85,7 @@ func collectFiles(ctx *context) *RepositoryMeta {
 			fileInfo := analyzeFile(d.Name(), f, rawSrc)
 			fileMeta := newFileMeta(fileInfo)
 			fileMeta.Name = strings.TrimPrefix(prettyPath, repo.name+"/")
+			fileMeta.SLOC = sloc
 			meta.Files = append(meta.Files, fileMeta)
 
 			meta.Size += len(rawSrc)

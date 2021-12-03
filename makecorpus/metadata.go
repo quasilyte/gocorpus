@@ -7,12 +7,18 @@ import (
 	"github.com/quasilyte/gocorpus/internal/filebits"
 )
 
+// 1 - The initial version.
+// 2 - Added 'Version' to CorpusMeta, 'SLOC' to FileMeta.
+const corpusVersion = 2
+
 type CorpusMeta struct {
+	Version      int
 	Repositories []*RepositoryMeta
 }
 
 func (m *CorpusMeta) WriteJSON(w io.Writer, indent int) {
 	w.Write([]byte("{\n"))
+	fmt.Fprintf(w, "\t\"Version\": %d,\n", m.Version)
 	w.Write([]byte("\t\"Repositories\": [\n"))
 	for i, s := range m.Repositories {
 		s.WriteJSON(w, indent+1)
@@ -69,10 +75,11 @@ func (m *RepositoryMeta) WriteJSON(w io.Writer, indent int) {
 type FileMeta struct {
 	Name  string
 	Flags int
+	SLOC  int
 }
 
 func (m *FileMeta) WriteJSON(w io.Writer, indent int) {
-	fmt.Fprintf(w, `%s{"Name": %q, "Flags": %d}`, tabs[indent], m.Name, m.Flags)
+	fmt.Fprintf(w, `%s{"Name": %q, "Flags": %d, "SLOC": %d}`, tabs[indent], m.Name, m.Flags, m.SLOC)
 }
 
 func newFileMeta(info *repositoryFileInfo) FileMeta {

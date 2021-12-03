@@ -175,7 +175,10 @@ func canSkipFile(cond filters.Bool3, flags, mask int) bool {
 	return false
 }
 
-var emptyResult = map[string]interface{}{"matches": []interface{}{}}
+var skipFileResult = map[string]interface{}{
+	"matches": []interface{}{},
+	"skipped": true,
+}
 
 func jsGogrep(this js.Value, args []js.Value) interface{} {
 	argsObject := args[0]
@@ -192,13 +195,13 @@ func jsGogrep(this js.Value, args []js.Value) interface{} {
 
 	// Check whether we can skip this file without parsing it.
 	if canSkipFile(filterInfo.TestFileCond, fileFlags, filebits.IsTest) {
-		return emptyResult
+		return skipFileResult
 	}
 	if canSkipFile(filterInfo.MainFileCond, fileFlags, filebits.IsMain) {
-		return emptyResult
+		return skipFileResult
 	}
 	if canSkipFile(filterInfo.AutogenFileCond, fileFlags, filebits.IsAutogen) {
-		return emptyResult
+		return skipFileResult
 	}
 
 	fset := token.NewFileSet()
@@ -223,5 +226,8 @@ func jsGogrep(this js.Value, args []js.Value) interface{} {
 		})
 		return true
 	})
-	return map[string]interface{}{"matches": matches}
+	return map[string]interface{}{
+		"matches": matches,
+		"skipped": false,
+	}
 }

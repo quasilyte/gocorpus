@@ -15,10 +15,12 @@ namespace App {
 
     interface gogrepResult {
         err?: string;
+        skipped?: boolean;
         matches?: string[];
     }
 
     interface corpusInfo {
+        Version: number;
         Repositories: repositoryInfo[];
     }
 
@@ -35,7 +37,8 @@ namespace App {
 
     interface repositoryFileInfo {
         Name: string;
-        Flags: number;   
+        Flags: number;
+        SLOC: number;
     }
 
     class RepoData {
@@ -69,9 +72,11 @@ namespace App {
 
         // Current query state.
         runError: '',
+        runStartTime: 0,
         searchResults: new Map<string, number>(),
         filesTotal: 0,
         filesScanned: 0,
+        slocProcessed: 0,
         hits: 0,
     };
 
@@ -130,7 +135,16 @@ namespace App {
         })();
     }
 
+    function calculateFrequencyScore(): number {
+        const baselineFrequency = 70.0; // `err != nil` score
+        const resultFrequency = appState.slocProcessed / appState.hits;
+        return 100.0 * (baselineFrequency / resultFrequency);
+    }
+
     function searchDone() {
+        let endTime = window.performance.now();
+        let elapsedMillis = endTime - appState.runStartTime;
+        let elapsedSeconds = elapsedMillis / 1000.0;
         appState.busy = false;
         ready();
         var $run = document.getElementById('run-button');
@@ -141,6 +155,9 @@ namespace App {
         var $results = document.getElementById('search-results');
         var parts = [];
         var sortedMatches = [...appState.searchResults.entries()].sort((a, b) => b[1] - a[1]);
+        let freqScore = calculateFrequencyScore();
+        parts.push(`<p><i>Frequency score: ${freqScore.toFixed(4)}</i></p>`);
+        parts.push(`<p><i>Time elapsed: ${elapsedSeconds.toFixed(2)} sec</i></p>`);
         for (let e of sortedMatches) {
             let [m, num] = e;
             let numStr = num == 1 ? '' : ` (${num} matches)`;
@@ -176,10 +193,11 @@ namespace App {
                 let progressValue = Math.round((appState.filesScanned / appState.filesTotal) * 100);
                 $progress.innerHTML = `Progress: ${progressValue}% (hits: ${appState.hits})`;
 
+                let fileInfo = repo.Files[i];
                 let result = gogrep({
                     pattern: pattern,
                     filter: filter,
-                    fileFlags: repo.Files[i].Flags,
+                    fileFlags: fileInfo.Flags,
                     targetName: f.name,
                     targetSrc: f.contents,
                 });
@@ -192,6 +210,9 @@ namespace App {
                     appState.runError = result.err;
                     appState.running = false;
                     return false;
+                }
+                if (!result.skipped) {
+                    appState.slocProcessed += fileInfo.SLOC;
                 }
                 appState.filesScanned++;
                 if (!result.matches) {
@@ -366,6 +387,7 @@ namespace App {
             $results.innerHTML = '';
             appState.searchResults.clear();
             appState.filesScanned = 0;
+            appState.slocProcessed = 0;
             appState.filesTotal = 0;
             appState.hits = 0;
             let repos = getSelectedRepos();
@@ -377,6 +399,7 @@ namespace App {
                 $progress.innerHTML = '';
                 $run.innerText = 'Stop';
                 appState.running = true;
+                appState.runStartTime = window.performance.now();
                 runQueryRecursive(pattern, filter, repos);
             });
         };
