@@ -51,4 +51,19 @@ const (
 
 	// OpVarIsPure = vars[$Str].IsPure()
 	OpVarIsPure
+
+	// OpVarIsStringLit = vars[$Str].IsStringLit()
+	OpVarIsStringLit
+
+	// OpVarIsRuneLit = vars[$Str].IsRuneLit()
+	OpVarIsRuneLit
+
+	// OpVarIsIntLit = vars[$Str].IsIntLit()
+	OpVarIsIntLit
+
+	// OpVarIsFloatLit = vars[$Str].IsFloatLit()
+	OpVarIsFloatLit
+
+	// OpVarIsComplexLit = vars[$Str].IsComplexLit()
+	OpVarIsComplexLit
 )

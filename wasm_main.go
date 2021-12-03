@@ -95,6 +95,27 @@ func isConstExpr(e ast.Expr) bool {
 	}
 }
 
+var badExpr = &ast.BadExpr{}
+
+func getMatchExpr(m gogrep.MatchData, name string) ast.Expr {
+	n, ok := m.CapturedByName(name)
+	if !ok {
+		return badExpr
+	}
+	e, ok := n.(ast.Expr)
+	if !ok {
+		return badExpr
+	}
+	return e
+}
+
+func checkBasicLit(n ast.Expr, kind token.Token) bool {
+	if lit, ok := n.(*ast.BasicLit); ok {
+		return lit.Kind == kind
+	}
+	return false
+}
+
 func applyFilter(f *filters.Expr, n ast.Node, m gogrep.MatchData) bool {
 	switch f.Op {
 	case filters.OpNot:
@@ -115,6 +136,17 @@ func applyFilter(f *filters.Expr, n ast.Node, m gogrep.MatchData) bool {
 			return isConstExpr(e)
 		}
 		return false
+
+	case filters.OpVarIsStringLit:
+		return checkBasicLit(getMatchExpr(m, f.Str), token.STRING)
+	case filters.OpVarIsRuneLit:
+		return checkBasicLit(getMatchExpr(m, f.Str), token.CHAR)
+	case filters.OpVarIsIntLit:
+		return checkBasicLit(getMatchExpr(m, f.Str), token.INT)
+	case filters.OpVarIsFloatLit:
+		return checkBasicLit(getMatchExpr(m, f.Str), token.FLOAT)
+	case filters.OpVarIsComplexLit:
+		return checkBasicLit(getMatchExpr(m, f.Str), token.IMAG)
 
 	case filters.OpVarIsPure:
 		v, ok := m.CapturedByName(f.Str)

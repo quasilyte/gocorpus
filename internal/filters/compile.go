@@ -114,6 +114,16 @@ func (cl *compiler) compilePatternVarMethodCallExpr(root *ast.CallExpr, varname 
 		return &Expr{Op: OpVarIsConst, Str: varname}, nil
 	case "IsPure":
 		return &Expr{Op: OpVarIsPure, Str: varname}, nil
+	case "IsStringLit":
+		return &Expr{Op: OpVarIsStringLit, Str: varname}, nil
+	case "IsRuneLit":
+		return &Expr{Op: OpVarIsRuneLit, Str: varname}, nil
+	case "IsIntLit":
+		return &Expr{Op: OpVarIsIntLit, Str: varname}, nil
+	case "IsFloatLit":
+		return &Expr{Op: OpVarIsFloatLit, Str: varname}, nil
+	case "IsComplexLit":
+		return &Expr{Op: OpVarIsComplexLit, Str: varname}, nil
 	default:
 		return nil, fmt.Errorf("compile %s method call: unsupported %s method", varname, method.Name)
 	}

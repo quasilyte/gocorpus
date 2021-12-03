@@ -15,11 +15,16 @@ func _() {
 	_ = x[OpOr-4]
 	_ = x[OpVarIsConst-5]
 	_ = x[OpVarIsPure-6]
+	_ = x[OpVarIsStringLit-7]
+	_ = x[OpVarIsRuneLit-8]
+	_ = x[OpVarIsIntLit-9]
+	_ = x[OpVarIsFloatLit-10]
+	_ = x[OpVarIsComplexLit-11]
 }
 
-const _Operation_name = "InvalidNopNotAndOrVarIsConstVarIsPure"
+const _Operation_name = "InvalidNopNotAndOrVarIsConstVarIsPureVarIsStringLitVarIsRuneLitVarIsIntLitVarIsFloatLitVarIsComplexLit"
 
-var _Operation_index = [...]uint8{0, 7, 10, 13, 16, 18, 28, 37}
+var _Operation_index = [...]uint8{0, 7, 10, 13, 16, 18, 28, 37, 51, 63, 74, 87, 102}
 
 func (i Operation) String() string {
 	if i < 0 || i >= Operation(len(_Operation_index)-1) {

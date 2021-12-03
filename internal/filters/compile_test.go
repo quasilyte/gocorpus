@@ -59,6 +59,27 @@ func TestCompile(t *testing.T) {
 		},
 
 		{
+			input: `$x.IsStringLit()`,
+			expr:  `(VarIsStringLit "x")`,
+		},
+		{
+			input: `$x.IsRuneLit()`,
+			expr:  `(VarIsRuneLit "x")`,
+		},
+		{
+			input: `$x.IsIntLit()`,
+			expr:  `(VarIsIntLit "x")`,
+		},
+		{
+			input: `$x.IsFloatLit()`,
+			expr:  `(VarIsFloatLit "x")`,
+		},
+		{
+			input: `$x.IsComplexLit()`,
+			expr:  `(VarIsComplexLit "x")`,
+		},
+
+		{
 			input: `!file.IsAutogen() && (!$x.IsPure() || !$y.IsPure())`,
 			expr:  `(Or (Not (VarIsPure "x")) (Not (VarIsPure "y")))`,
 			info:  `AutogenFileCond=false`,
