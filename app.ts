@@ -145,6 +145,12 @@ namespace App {
         return [relativeRate, Math.round(resultFrequency)];
     }
 
+    function htmlEscape(s: string): string {
+        let div = document.createElement('div');
+        div.innerText = s;
+        return div.innerHTML;
+    }
+
     function searchDone() {
         let endTime = window.performance.now();
         let elapsedMillis = endTime - appState.runStartTime;
@@ -169,7 +175,7 @@ namespace App {
         for (let e of sortedMatches) {
             let [m, num] = e;
             let numStr = num == 1 ? '' : ` (${num} matches)`;
-            parts.push(`<li><span class="result">${m}${numStr}</span></li>`);
+            parts.push(`<li><span class="result">${htmlEscape(m)}${numStr}</span></li>`);
         }
         $results.innerHTML += '<ol>' + parts.join('') + '</ol>';
     }
