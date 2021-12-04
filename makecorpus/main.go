@@ -70,6 +70,10 @@ func main() {
 		log.Printf("errors: %d", ctx.numErrors)
 	}
 
+	avgDepth := ctx.totalDepth / ctx.numFiles
+	log.Printf("max file depth: %d", ctx.maxDepth)
+	log.Printf("avg file depth: %d", avgDepth)
+
 	exitCode := 0
 	if ctx.numErrors != 0 {
 		exitCode = 1
@@ -89,6 +93,10 @@ type context struct {
 
 	outDir  string
 	verbose bool
+
+	maxDepth   int64
+	totalDepth int64
+	numFiles   int64
 
 	numErrors   int
 	numWarnings int

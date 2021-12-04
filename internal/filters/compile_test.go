@@ -106,6 +106,32 @@ func TestCompile(t *testing.T) {
 			expr:  `(And (VarIsConst "x") (Not (VarIsConst "y")))`,
 			info:  `TestFileCond=false`,
 		},
+
+		{
+			input: `file.MaxDepth() <= 100`,
+			expr:  `Nop`,
+			info:  `FileMaxDepth<=100`,
+		},
+		{
+			input: `100 >= file.MaxDepth()`,
+			expr:  `Nop`,
+			info:  `FileMaxDepth<=100`,
+		},
+		{
+			input: `file.MaxDepth() == 10`,
+			expr:  `Nop`,
+			info:  `FileMaxDepth==10`,
+		},
+		{
+			input: `10 == file.MaxDepth()`,
+			expr:  `Nop`,
+			info:  `FileMaxDepth==10`,
+		},
+		{
+			input: `!(file.MaxDepth() != 10)`,
+			expr:  `Nop`,
+			info:  `FileMaxDepth==10`,
+		},
 	}
 
 	for i := range tests {

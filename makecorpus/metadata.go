@@ -9,6 +9,7 @@ import (
 
 // 1 - The initial version.
 // 2 - Added 'Version' to CorpusMeta, 'SLOC' to FileMeta.
+// 3 - Added 'MaxDepth' to FileMeta.
 const corpusVersion = 2
 
 type CorpusMeta struct {
@@ -73,17 +74,19 @@ func (m *RepositoryMeta) WriteJSON(w io.Writer, indent int) {
 }
 
 type FileMeta struct {
-	Name  string
-	Flags int
-	SLOC  int
+	Name     string
+	Flags    int
+	SLOC     int
+	MaxDepth int
 }
 
 func (m *FileMeta) WriteJSON(w io.Writer, indent int) {
-	fmt.Fprintf(w, `%s{"Name": %q, "Flags": %d, "SLOC": %d}`, tabs[indent], m.Name, m.Flags, m.SLOC)
+	fmt.Fprintf(w, `%s{"Name": %q, "Flags": %d, "SLOC": %d, "MaxDepth": %d}`, tabs[indent], m.Name, m.Flags, m.SLOC, m.MaxDepth)
 }
 
 func newFileMeta(info *repositoryFileInfo) FileMeta {
 	var m FileMeta
+	m.MaxDepth = info.maxDepth
 	if info.isTest {
 		m.Flags |= filebits.IsTest
 	}

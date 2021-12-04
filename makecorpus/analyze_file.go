@@ -13,6 +13,7 @@ type repositoryFileInfo struct {
 	importsC       bool
 	importsUnsafe  bool
 	importsReflect bool
+	maxDepth       int
 }
 
 func analyzeFile(filename string, f *ast.File, src []byte) *repositoryFileInfo {
@@ -29,6 +30,19 @@ func analyzeFile(filename string, f *ast.File, src []byte) *repositoryFileInfo {
 			break
 		}
 	}
+
+	depth := 0
+	ast.Inspect(f, func(n ast.Node) bool {
+		if n == nil {
+			depth--
+		} else {
+			depth++
+			if depth > info.maxDepth {
+				info.maxDepth = depth
+			}
+		}
+		return true
+	})
 
 	for _, imp := range f.Imports {
 		path, err := strconv.Unquote(imp.Path.Value)

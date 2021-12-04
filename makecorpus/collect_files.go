@@ -88,6 +88,11 @@ func collectFiles(ctx *context) *RepositoryMeta {
 			fileMeta.SLOC = sloc
 			meta.Files = append(meta.Files, fileMeta)
 
+			ctx.totalDepth += int64(fileInfo.maxDepth)
+			if int64(fileInfo.maxDepth) > ctx.maxDepth {
+				ctx.maxDepth = int64(fileInfo.maxDepth)
+			}
+
 			meta.Size += len(rawSrc)
 			meta.MinifiedSize += len(minifiedSrc)
 
@@ -103,6 +108,8 @@ func collectFiles(ctx *context) *RepositoryMeta {
 			return nil
 		}
 	}
+
+	ctx.numFiles += int64(numFiles)
 
 	ctx.logDebugf("processed %d files (SLOC=%d)", numFiles, meta.SLOC)
 	return meta

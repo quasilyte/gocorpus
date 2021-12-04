@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"strconv"
 	"strings"
 )
 
@@ -174,15 +175,76 @@ func (cl *compiler) compileUnaryExpr(root *ast.UnaryExpr) (*Expr, error) {
 }
 
 func (cl *compiler) compileBinaryExpr(root *ast.BinaryExpr) (*Expr, error) {
-	switch root.Op {
+	if _, ok := root.X.(*ast.BasicLit); ok {
+		if _, ok := root.Y.(*ast.BasicLit); !ok {
+			switch root.Op {
+			case token.GEQ:
+				return cl.compileBinaryExprXY(token.LEQ, root.Y, root.X)
+			case token.LEQ:
+				return cl.compileBinaryExprXY(token.GEQ, root.Y, root.X)
+			case token.GTR:
+				return cl.compileBinaryExprXY(token.LSS, root.Y, root.X)
+			case token.LSS:
+				return cl.compileBinaryExprXY(token.GTR, root.Y, root.X)
+			case token.EQL:
+				return cl.compileBinaryExprXY(token.EQL, root.Y, root.X)
+			case token.NEQ:
+				return cl.compileBinaryExprXY(token.NEQ, root.Y, root.X)
+			}
+		}
+	}
+
+	return cl.compileBinaryExprXY(root.Op, root.X, root.Y)
+}
+
+func (cl *compiler) invertOp(op token.Token) token.Token {
+	switch op {
+	case token.EQL:
+		return token.NEQ
+	case token.NEQ:
+		return token.EQL
+	case token.LSS:
+		return token.GEQ
+	case token.GTR:
+		return token.LEQ
+	case token.LEQ:
+		return token.GTR
+	case token.GEQ:
+		return token.LSS
+
+	default:
+		return token.ILLEGAL
+	}
+}
+
+func (cl *compiler) compileBinaryExprXY(op token.Token, x, y ast.Expr) (*Expr, error) {
+	fileProp := cl.unpackFileOperand(x)
+
+	switch op {
+	case token.LEQ, token.GEQ, token.LSS, token.GTR, token.EQL, token.NEQ:
+		if fileProp != "" {
+			if !cl.isTopLevel {
+				return nil, fmt.Errorf("file filters can't be a part of || expression")
+			}
+			if cl.isNegated {
+				op = cl.invertOp(op)
+			}
+			rhsValue, ok := cl.toInt(y)
+			if op != token.ILLEGAL && ok {
+				cl.info.FileMaxDepthOp = op
+				cl.info.FileMaxDepth = int(rhsValue)
+				return &Expr{Op: OpNop}, nil
+			}
+		}
+
 	case token.LOR:
 		isTopLevel := cl.isTopLevel
 		cl.isTopLevel = false
-		lhs, err := cl.CompileExpr(root.X)
+		lhs, err := cl.CompileExpr(x)
 		if err != nil {
 			return nil, err
 		}
-		rhs, err := cl.CompileExpr(root.Y)
+		rhs, err := cl.CompileExpr(y)
 		if err != nil {
 			return nil, err
 		}
@@ -190,17 +252,55 @@ func (cl *compiler) compileBinaryExpr(root *ast.BinaryExpr) (*Expr, error) {
 		return &Expr{Op: OpOr, Args: []*Expr{lhs, rhs}}, nil
 
 	case token.LAND:
-		lhs, err := cl.CompileExpr(root.X)
+		lhs, err := cl.CompileExpr(x)
 		if err != nil {
 			return nil, err
 		}
-		rhs, err := cl.CompileExpr(root.Y)
+		rhs, err := cl.CompileExpr(y)
 		if err != nil {
 			return nil, err
 		}
 		return &Expr{Op: OpAnd, Args: []*Expr{lhs, rhs}}, nil
+	}
+
+	return nil, fmt.Errorf("compile binary expr: unsupported %s", op)
+}
+
+func (cl *compiler) toInt(e ast.Expr) (int64, bool) {
+	switch e := e.(type) {
+	case *ast.BasicLit:
+		if e.Kind != token.INT {
+			return 0, false
+		}
+		v, err := strconv.ParseInt(e.Value, 0, 64)
+		if err != nil {
+			return 0, false
+		}
+		return int64(v), true
+
+	case *ast.ParenExpr:
+		return cl.toInt(e.X)
 
 	default:
-		return nil, fmt.Errorf("compile binary expr: unsupported %s", root.Op)
+		return 0, false
 	}
+}
+
+func (cl *compiler) unpackFileOperand(e ast.Expr) string {
+	call, ok := e.(*ast.CallExpr)
+	if !ok {
+		return ""
+	}
+	selector, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return ""
+	}
+	object, ok := selector.X.(*ast.Ident)
+	if !ok {
+		return ""
+	}
+	if object.Name != "file" {
+		return ""
+	}
+	return selector.Sel.Name
 }

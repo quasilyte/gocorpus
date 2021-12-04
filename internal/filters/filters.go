@@ -1,11 +1,18 @@
 package filters
 
-import "strings"
+import (
+	"fmt"
+	"go/token"
+	"strings"
+)
 
 type Info struct {
 	TestFileCond    Bool3
 	AutogenFileCond Bool3
 	MainFileCond    Bool3
+
+	FileMaxDepth   int
+	FileMaxDepthOp token.Token
 }
 
 func (i Info) String() string {
@@ -18,6 +25,9 @@ func (i Info) String() string {
 	}
 	if !i.MainFileCond.IsUnset() {
 		parts = append(parts, "MainFileCond="+i.MainFileCond.String())
+	}
+	if i.FileMaxDepthOp != token.ILLEGAL {
+		parts = append(parts, fmt.Sprintf("FileMaxDepth%s%d", i.FileMaxDepthOp, i.FileMaxDepth))
 	}
 	return strings.Join(parts, " ")
 }

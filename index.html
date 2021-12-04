@@ -16,7 +16,7 @@
             Search over a Go corpus (totalling <span id="total-sloc">?</span> SLOC)
             
           </td>
-          <td style="width: 360px">
+          <td style="width: 440px">
             <button id="run-button">Run</button>
             <button id="share-button" style="margin-left: 8px;">Share</button>
             <button id="help-button" style="margin-left: 8px;">Help</button>
@@ -32,7 +32,7 @@
           <td>
             Filter
             <div class="code-block">
-              <textarea id="results-filter" class="editor code block" data-gramm="false" spellcheck="false">!file.IsAutogen()</textarea>
+              <textarea id="results-filter" class="editor code block" data-gramm="false" spellcheck="false">!file.IsAutogen() && file.MaxDepth() &lt;= 100</textarea>
             </div>
           </td>
       </tr>

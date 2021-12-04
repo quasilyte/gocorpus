@@ -165,6 +165,29 @@ func applyFilter(f *filters.Expr, n ast.Node, m gogrep.MatchData) bool {
 	return true
 }
 
+func checkFileDepth(op token.Token, fileDepth, limit int) bool {
+	if op == token.ILLEGAL {
+		return true
+	}
+	switch op {
+	case token.EQL:
+		return fileDepth == limit
+	case token.NEQ:
+		return fileDepth != limit
+	case token.LSS:
+		return fileDepth < limit
+	case token.GTR:
+		return fileDepth > limit
+	case token.LEQ:
+		return fileDepth <= limit
+	case token.GEQ:
+		return fileDepth >= limit
+
+	default:
+		return true
+	}
+}
+
 func canSkipFile(cond filters.Bool3, flags, mask int) bool {
 	if cond.IsTrue() && !filebits.Check(flags, mask) {
 		return true
@@ -185,6 +208,7 @@ func jsGogrep(this js.Value, args []js.Value) interface{} {
 	patString := argsObject.Get("pattern").String()
 	filterString := argsObject.Get("filter").String()
 	fileFlags := argsObject.Get("fileFlags").Int()
+	fileMaxDepth := argsObject.Get("fileMaxDepth").Int()
 	targetName := argsObject.Get("targetName").String()
 	targetSrc := argsObject.Get("targetSrc").String()
 
@@ -194,6 +218,9 @@ func jsGogrep(this js.Value, args []js.Value) interface{} {
 	}
 
 	// Check whether we can skip this file without parsing it.
+	if !checkFileDepth(filterInfo.FileMaxDepthOp, fileMaxDepth, filterInfo.FileMaxDepth) {
+		return skipFileResult
+	}
 	if canSkipFile(filterInfo.TestFileCond, fileFlags, filebits.IsTest) {
 		return skipFileResult
 	}

@@ -39,6 +39,7 @@ namespace App {
         Name: string;
         Flags: number;
         SLOC: number;
+        MaxDepth: number;
     }
 
     class RepoData {
@@ -54,6 +55,7 @@ namespace App {
         pattern: string;
         filter: string;
         fileFlags: number;
+        fileMaxDepth: number;
         targetName: string;
         targetSrc: string;
     }
@@ -204,6 +206,7 @@ namespace App {
                     pattern: pattern,
                     filter: filter,
                     fileFlags: fileInfo.Flags,
+                    fileMaxDepth: fileInfo.MaxDepth,
                     targetName: f.name,
                     targetSrc: f.contents,
                 });
