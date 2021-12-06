@@ -196,11 +196,19 @@ namespace App {
                 }
                 let f = files[i];
                 let filename = f.name;
-                if (filename.length > 58) {
+                const maxLength = 50;
+                if (filename.length > maxLength) {
                     let nameParts = filename.split('/');
                     let baseName = nameParts[nameParts.length-1];
-                    let prefixLen = baseName.length >= 24 ? 28 : 42;
-                    filename = filename.substr(0, prefixLen) + '{...}/' + baseName;
+                    let shorterName = '';
+                    if (baseName.length >= maxLength) {
+                        shorterName = '{...}/' + baseName;
+                    } else {
+                        let prefix = nameParts.slice(0, -1).join('/');
+                        let prefixLen = maxLength - baseName.length - 4;
+                        shorterName = prefix.substr(0, prefixLen) + '{...}/' + baseName;
+                    }
+                    filename = shorterName;
                 }
                 updateStatus(`processing ${filename}`);
                 let $progress = document.getElementById('search-progress');
