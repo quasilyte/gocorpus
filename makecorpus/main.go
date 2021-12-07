@@ -31,6 +31,16 @@ func main() {
 	ctx.outDir = *outputDir
 	ctx.numRepos = len(repositoryList)
 
+	for i, repo := range repositoryList {
+		if err := validateRepo(repo); err != nil {
+			name := repo.name
+			if name == "" {
+				name = fmt.Sprintf("repo[%d]", i)
+			}
+			panic(fmt.Sprintf("%s: %v", name, err))
+		}
+	}
+
 	for i, s := range repositoryList {
 		ctx.i = i + 1
 		ctx.repo = s
