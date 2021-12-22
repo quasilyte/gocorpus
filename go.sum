@@ -1,3 +1,5 @@
+github.com/go-toolsmith/astcopy v1.0.0/go.mod h1:vrgyG+5Bxrnz4MZWPF+pI4R8h3qKRjjyvV/DSez4WVQ=
+github.com/go-toolsmith/astequal v1.0.0/go.mod h1:H+xSiq0+LtiDC11+h1G32h7Of5O3CYFJ99GVbS5lDKY=
 github.com/go-toolsmith/astequal v1.0.1 h1:JbSszi42Jiqu36Gnf363HWS9MTEAz67vTQLponh3Moc=
 github.com/go-toolsmith/astequal v1.0.1/go.mod h1:4oGA3EZXTVItV/ipGiOx7NWkY5veFfcsOJVS2YxltLw=
 github.com/go-toolsmith/strparse v1.0.0/go.mod h1:YI2nUKP9YGZnL/L1/DLFBfixrcjslWct4wyljWhSRy8=
@@ -7,4 +9,6 @@ github.com/quasilyte/gogrep v0.0.0-20211221131004-9c2aba6ca6bb h1:mv8EphmL2adjzj
 github.com/quasilyte/gogrep v0.0.0-20211221131004-9c2aba6ca6bb/go.mod h1:cOIDw+gi1CMpN7VMVdiMUadtrZau1JPspiuxNmvCruU=
 github.com/quasilyte/minformat v0.0.0-20201004161242-904513ea1a78 h1:sp4sPtKa8aLY4Xi9w5WE1HJmA5Sqp4ZFF38tFJi+ua4=
 github.com/quasilyte/minformat v0.0.0-20201004161242-904513ea1a78/go.mod h1:Im9phdUcsqUjI5iE6lNlRjGg7GuqQ0OCCDnbDiS61MI=
+github.com/quasilyte/minformat v0.0.0-20211222122333-f7164a849c1a h1:93kLwVx3xRt4Z0kfiNFaurhpK7EAFvqghspEpDOqE8Y=
+github.com/quasilyte/minformat v0.0.0-20211222122333-f7164a849c1a/go.mod h1:hVl36vCYpLMSzmM435tTz/ZNP9gaMd6t5sSPFhuK7Wk=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=

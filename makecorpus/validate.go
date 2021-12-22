@@ -12,7 +12,7 @@ var knownRepoTags = map[string]struct{}{
 	"compiler":   {},
 	"parser":     {},
 	"lib":        {},
-	"go-tool":    {},
+	"go-tools":   {},
 	"tool":       {},
 	"encoder":    {},
 	"decoder":    {},
