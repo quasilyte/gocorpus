@@ -10,7 +10,7 @@ import (
 
 	"github.com/quasilyte/gocorpus/internal/filebits"
 	"github.com/quasilyte/gocorpus/internal/filters"
-	"github.com/quasilyte/gocorpus/internal/gogrep"
+	"github.com/quasilyte/gogrep"
 )
 
 func main() {
@@ -236,7 +236,13 @@ func jsGogrep(this js.Value, args []js.Value) interface{} {
 	if err != nil {
 		return map[string]interface{}{"err": "parse Go: " + err.Error()}
 	}
-	pat, _, err := gogrep.Compile(fset, patString, false)
+	config := gogrep.CompileConfig{
+		Fset:      fset,
+		Src:       patString,
+		Strict:    false,
+		WithTypes: false,
+	}
+	pat, _, err := gogrep.Compile(config)
 	if err != nil {
 		return map[string]interface{}{"err": "parse pattern: " + err.Error()}
 	}
