@@ -224,4 +224,78 @@ var repositoryList = []*repository{
 		git:      "https://github.com/dgraph-io/badger.git",
 		srcRoots: []string{"."},
 	},
+
+	{
+		name:     "victoriametrics",
+		tags:     []string{"db", "metrics"},
+		git:      "https://github.com/VictoriaMetrics/VictoriaMetrics.git",
+		srcRoots: []string{"app", "lib"},
+	},
+	{
+		name:     "jackc-pgx",
+		tags:     []string{"lib", "sql"},
+		git:      "https://github.com/jackc/pgx.git",
+		srcRoots: []string{"."},
+	},
+	{
+		name:     "prometheus",
+		tags:     []string{"db", "metrics"},
+		git:      "https://github.com/prometheus/prometheus.git",
+		srcRoots: []string{"."},
+	},
+	{
+		name:     "talos",
+		tags:     []string{"os"},
+		git:      "https://github.com/talos-systems/talos.git",
+		srcRoots: []string{"."},
+	},
+	{
+		name:     "drone",
+		tags:     []string{"ci"},
+		git:      "https://github.com/harness/drone.git",
+		srcRoots: []string{"."},
+	},
+	{
+		name:     "grafana",
+		tags:     []string{"metrics"},
+		git:      "https://github.com/grafana/grafana.git",
+		srcRoots: []string{"."},
+	},
+
+	{
+		name:     "influxdb",
+		tags:     []string{"db"},
+		git:      "https://github.com/influxdata/influxdb.git",
+		srcRoots: []string{"."},
+	},
+	{
+		name:     "vitess",
+		tags:     []string{"db"},
+		git:      "https://github.com/vitessio/vitess.git",
+		srcRoots: []string{"."},
+	},
+	{
+		name:     "cilium",
+		tags:     []string{"ebpf"},
+		git:      "https://github.com/cilium/cilium.git",
+		srcRoots: []string{"."},
+	},
+	{
+		name:     "rook",
+		tags:     []string{"kubernetes"},
+		git:      "https://github.com/rook/rook.git",
+		srcRoots: []string{"."},
+	},
+	{
+		name:     "tyk",
+		tags:     []string{"grpc"},
+		git:      "https://github.com/TykTechnologies/tyk.git",
+		srcRoots: []string{"."},
+	},
+	{
+		name:     "grpc-go",
+		tags:     []string{"grpc", "net", "lib"},
+		git:      "https://github.com/grpc/grpc-go.git",
+		srcRoots: []string{"."},
+	},
 }

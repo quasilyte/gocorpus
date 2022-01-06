@@ -30,6 +30,7 @@ var knownRepoTags = map[string]struct{}{
 	"os":         {},
 	"ci":         {},
 	"nfs":        {},
+	"ebpf":       {},
 }
 
 func validateRepo(repo *repository) error {
