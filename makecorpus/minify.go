@@ -5,7 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 
-	"github.com/quasilyte/minformat/go/minformat"
+	"github.com/go-toolsmith/minformat"
 )
 
 func minifyGo(fset *token.FileSet, f *ast.File) []byte {
